@@ -55,7 +55,11 @@ const phrases = {
     'fruit_pessego': 'pêssego', 'fruit_pessegos': 'pêssegos',
 
     'want_more': 'Eu quero...',
-    'want_blender': 'Vitamina de...'
+    'want_blender': 'Vitamina de...',
+    'erro': 'Oops! Essa fruta não!',
+    'falta': 'Ainda falta',
+    'misturando': 'Misturando...',
+    'da_pra_mim': 'Dê para o monstro!'
 };
 
 async function generateTTS(filename, text) {
@@ -90,11 +94,12 @@ async function generateTTS(filename, text) {
 
 async function main() {
     console.log("Starting ElevenLabs Voice Generation...");
-    // Just sequentially request
-    for (const [filename, text] of Object.entries(phrases)) {
-        await generateTTS(filename, text);
-        // Add a small delay to avoid rate limits
-        await new Promise(resolve => setTimeout(resolve, 500));
+    const keysToGen = ['erro', 'falta', 'misturando', 'da_pra_mim'];
+    for (const key of keysToGen) {
+        if (phrases[key]) {
+            await generateTTS(key, phrases[key]);
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
     }
     console.log("Done generating ElevenLabs audios.");
 }
