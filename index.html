@@ -2061,7 +2061,8 @@
             state.eatenCount = 0;
 
             const name = getFruitName(state.targetType, state.targetCount);
-            const reqAudioKey = 'req_' + state.targetCount + '_' + state.targetType;
+            const safeType = getFruitName(state.targetType, 1);
+            const reqAudioKey = 'req_' + state.targetCount + '_' + safeType;
             playVoice(reqAudioKey);
 
             els.bellyCounter.innerText = state.eatenCount;
@@ -2141,7 +2142,8 @@
             }
             els.instruction.innerHTML = `Quero <span class="highlight-num">${state.targetCount}</span> ${pluralText}!`;
 
-            const reqAudioKey = 'req_' + state.targetCount + '_' + state.targetType;
+            const safeType = getFruitName(state.targetType, 1);
+            const reqAudioKey = 'req_' + state.targetCount + '_' + safeType;
             playVoice(reqAudioKey);
 
             fillBasket([state.targetType], state.targetCount);
