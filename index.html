@@ -2041,30 +2041,33 @@
             state.eatenCount = 0;
 
             const name = getFruitName(state.targetType, state.targetCount);
-            playVoice(['instr_feed', 'num_' + state.targetCount, 'fruit_' + name]);
+            const reqAudioKey = 'req_' + state.targetCount + '_' + state.targetType;
+            playVoice(reqAudioKey);
 
             els.bellyCounter.innerText = state.eatenCount;
             els.instruction.innerHTML = `Eu quero <b>${state.targetCount}</b> ${name.toUpperCase()}!`;
             els.instruction.style.display = 'block';
 
-            let hasTarget = false;
-            // Gera 5 frutas na bancada (aumentamos de 4 para 5)
-            for (let i = 0; i < 5; i++) {
-                let type;
-                if (!hasTarget && i === 4) {
-                    type = state.targetType;
-                    hasTarget = true;
+            let shelfTypes = [];
+            for (let i = 0; i < state.targetCount; i++) shelfTypes.push(state.targetType);
+            while (shelfTypes.length < 5) {
+                if (Math.random() > 0.8) {
+                    shelfTypes.push(Math.random() > 0.5 ? 'pimenta' : 'limão');
                 } else {
-                    // Maior chance de pimenta e limão
-                    if (Math.random() > 0.8) {
-                        type = Math.random() > 0.5 ? 'pimenta' : 'limão';
-                    } else {
-                        type = types[Math.floor(Math.random() * types.length)];
-                    }
-                    if (type === state.targetType) hasTarget = true;
+                    shelfTypes.push(types[Math.floor(Math.random() * types.length)]);
                 }
-                createShelfFruit(type, 10 + i * 20); // Distribui no CSS left (10% a 90%)
             }
+            shelfTypes.sort(() => Math.random() - 0.5);
+
+            shelfTypes.forEach(type => {
+                const item = document.createElement('div');
+                item.className = 'basket-item';
+                item.innerHTML = `<svg viewBox="0 0 70 70" style="width:100%; height:100%; pointer-events:none;">${fruitsData[type].shape}</svg>`;
+                item.dataset.type = type;
+                item.addEventListener('touchstart', handleFruitDragStart, { passive: false });
+                item.addEventListener('mousedown', handleFruitDragStart);
+                els.shelf.appendChild(item);
+            });
 
             // Esconde-esconde (Moitinha)
             if (Math.random() > 0.7) {
@@ -2118,16 +2121,8 @@
             }
             els.instruction.innerHTML = `Quero <span class="highlight-num">${state.targetCount}</span> ${pluralText}!`;
 
-            const gender = fruitsData[state.targetType].gender;
-            let numAudio = state.targetCount.toString();
-            if (state.targetCount === 1) numAudio = (gender === 'm') ? '1' : 'uma';
-            if (state.targetCount === 2) numAudio = (gender === 'm') ? '2' : 'duas';
-            if (state.targetCount === 3) numAudio = '3';
-
-            const audioFruitName = getFruitName(state.targetType, state.targetCount);
-
-            // "Achei você!" ou similar. Vamos reaproveitar a risada ou só pedir
-            playVoice(['quero', numAudio, audioFruitName]);
+            const reqAudioKey = 'req_' + state.targetCount + '_' + state.targetType;
+            playVoice(reqAudioKey);
 
             fillBasket([state.targetType], state.targetCount);
         }
