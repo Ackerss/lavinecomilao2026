@@ -518,6 +518,19 @@
             opacity: 0.9;
         }
 
+        @media (max-width: 480px) {
+            #paint-panel {
+                gap: 8px;
+                padding: 10px 15px;
+                width: 90%;
+            }
+
+            .paint-pot {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
         #poop-btn {
             position: absolute;
             top: 50%;
@@ -607,7 +620,7 @@
         /* --- TEETH BRUSHING --- */
         #btn-teeth {
             position: absolute;
-            top: 35%;
+            top: 65%;
             right: 20px;
             width: 80px;
             height: 80px;
@@ -1516,6 +1529,7 @@
             els.shelf.style.opacity = '1';
             els.shelf.style.pointerEvents = 'auto';
             if (state.needsTeethBrushing) els.btnTeeth.style.display = 'flex';
+            else els.btnTeeth.style.display = 'none';
 
             // Reset monster color to default
             els.monsterBody.style.fill = 'url(#monster-body-grad)';
@@ -1528,9 +1542,14 @@
             if (state.needsPoop) return;
 
             if (state.mode === newMode) {
+                const oldMode = state.mode;
                 state.mode = 'normal';
                 clearModeVisuals();
-                startRound();
+                if (oldMode === 'blender' || state.targetCount <= 0) {
+                    startRound();
+                } else {
+                    els.instruction.style.display = 'block';
+                }
                 return;
             }
 
@@ -1601,8 +1620,6 @@
         function hideShelf() {
             els.shelf.style.opacity = '0.3';
             els.shelf.style.pointerEvents = 'none';
-            const oldFruits = els.shelf.querySelectorAll('.basket-item');
-            oldFruits.forEach(el => el.remove());
         }
 
         function setupInteractionEvents() {
@@ -1701,7 +1718,7 @@
                                     els.brushCursor.style.animationPlayState = 'paused';
                                     els.btnTeeth.classList.remove('btn-active');
                                     // playVoice('monster_bath_laugh'); ou pling
-                                    setTimeout(() => setMode('normal'), 1500);
+                                    setTimeout(() => setMode('teeth'), 1500);
                                 }
                             }
                         }
@@ -1840,6 +1857,9 @@
 
             const oldFruits = els.shelf.querySelectorAll('.basket-item');
             oldFruits.forEach(el => el.remove());
+
+            els.bellyCounter.innerText = '';
+            els.eatenFruits.innerHTML = '';
 
             if (state.mode === 'normal') setupNormalRound();
             else if (state.mode === 'blender') setupBlenderRound();
@@ -2179,7 +2199,7 @@
             const num2 = (fruitsData[type2].gender === 'm') ? 'num_1' : 'uma';
 
             // Voltamos ao estilo original de audio encadeado que soava nativo antes da fase 8
-            playVoice(['modo_vitamina', 'vitamina_de', num1, f1Safe, num2, f2Safe]);
+            playVoice(['modo_vitamina', 'vitamina_de', num1, 'fruit_' + f1Safe, 'e', num2, 'fruit_' + f2Safe]);
 
             let itemsHtml = '';
             for (let [t, q] of Object.entries(state.blenderRecipe)) {
